@@ -13,7 +13,9 @@ class Animation
   final int _animationFrameRate = 10; // frames
   int _counter = 0;
   
-  String name() => _name;
+  String get name => _name;
+  
+  bool isCompleted() => (_currentSpriteIndex > _sprites.length);
   
   Animation({String name, bool loopBack:true})
   {
@@ -34,8 +36,14 @@ class Animation
     if (_sprites.length == 0)
       return;
     
-    if (_currentSpriteIndex >= _sprites.length )
+    if (_currentSpriteIndex > _sprites.length )
       return;
+    
+    if (_currentSpriteIndex == _sprites.length )
+    {
+      _currentSpriteIndex++;
+      return;
+    }
     
     _counter += delta;
     if (_counter > _durations[_currentSpriteIndex])

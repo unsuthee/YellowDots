@@ -22,19 +22,8 @@ class Environment
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  Environment(PacmanGame game, Layout layout)
+  void setupAgents(Layout layout)
   {
-    _game = game;
-    capsules = new List<Capsule>();
-    
-    chaseTime = 0;
-    scatterTime = scatterTimePeriod;
-
-    for (final pos in layout.capsuleLookup)
-    {
-      capsules.add(new Capsule(tx:pos[0],ty:pos[1]));
-    }
-   
     for (String name in layout.agentPos.keys)
     {
       Agent agent = null;
@@ -69,7 +58,27 @@ class Environment
         default:
           break;
       }
+      if (agent != null)
+      {
+        agent.onGameRestart();
+      }
     }
+  }
+  
+  Environment(PacmanGame game, Layout layout)
+  {
+    _game = game;
+    capsules = new List<Capsule>();
+    
+    chaseTime = 0;
+    scatterTime = scatterTimePeriod;
+
+    for (final pos in layout.capsuleLookup)
+    {
+      capsules.add(new Capsule(tx:pos[0],ty:pos[1]));
+    }
+   
+    setupAgents(layout);
   }
   
   ////////////////////////////////////////////////////////////////////////////////
@@ -95,11 +104,21 @@ class Environment
  
   void restartGame()
   {
+    _game.scoreboard.incLifeCount(-1);
+    if (_game.scoreboard.lives == 0)
+    {
+      print("game is over");
+    }
+    setupAgents(_game.layout);
+    _game.dirtyBackground();
+    
+    /**
     for (Agent ghost in agents.values)
     {
       ghost.onGameRestart();
     }
     pacman.onGameRestart();
+    **/
   }
   
   void notifyPacmanEaten(Agent eater)
@@ -154,7 +173,6 @@ class Environment
        if (pacmanPos[0] == agent.tilex && pacmanPos[1] == agent.tiley)
        {
          colliders.add(agent);
-         //notifyPacmanEaten(agent);
        }
     }
     
@@ -164,10 +182,14 @@ class Environment
       {
         if (agent.isEatable())
         {
-          //print("agent:${agent.name} is eaten");
           agent.onGhostEaten();
           _game.scoreboard.incScore(Scoreboard.GHOST_SCORE);
           _game.scoreboard.drawScore();
+        }
+        else if (!agent.isKO())
+        {
+          notifyPacmanEaten(agent);
+          break;
         }
       }
     }

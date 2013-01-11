@@ -40,13 +40,19 @@ class PacmanAgent extends Agent
       },
       "KO": {
         "sprites": [[0,14],[1,14],[2,14],[3,14],[4,14],[5,14],[6,14],[7,14],[0,15],[1,15]],
-        "loop": "false"
+        "loop": "false",
+        "default_duration": 200
       }   
     }
     ''';
     return data;
   }
  
+  void onGhostEaten()
+  {
+    print("Pacman eat ghost");
+  }
+  
   void onPacmanEaten(Agent eater)
   {
     _state = Agent.STATE_KO;
@@ -221,47 +227,63 @@ class PacmanAgent extends Agent
   }
   
   void update(num delta)
-  {
-    if (_currAnimation != null)
-    {
-      _currAnimation.update(delta);
-    }
-    
+  {    
     switch (_state)
     {
+      case Agent.STATE_KO:
+      {
+        if (_currAnimation != null)
+        {
+          if (!_currAnimation.isCompleted())
+          {
+            _currAnimation.update(delta);
+          }
+          else 
+          {
+            env.restartGame();
+          }
+        }
+      }
+      break;
+        
       case Agent.STATE_MOVING:
       case Agent.STATE_SCATTER:
       case Agent.STATE_TRAP:
       {
+        if (_currAnimation != null)
+        {
+          _currAnimation.update(delta);
+        }
+        
         handleCollision();
         
-        var savedPos = [box().cx,box().cy];
+        var savedPos = [box.cx,box.cy];
         var savedTile = [tilex,tiley];
         
         switch(_currentDirection)
         {
           case DEF.NORTH:
-            box().cy -= _currentSpeed;
+            box.cy -= _currentSpeed;
             alignToVerticalAxis();
             break;
           case DEF.SOUTH:
-            box().cy += _currentSpeed;
+            box.cy += _currentSpeed;
             alignToVerticalAxis();
             break;
           case DEF.EAST:
-            box().cx += _currentSpeed;
+            box.cx += _currentSpeed;
             alignToHorizontalAxis();
             break;
           case DEF.WEST:
-            box().cx -= _currentSpeed;
+            box.cx -= _currentSpeed;
             alignToHorizontalAxis();
             break;
         }
         
         if (hasCollideToWall())
         {
-          box().cx = savedPos[0];
-          box().cy = savedPos[1];
+          box.cx = savedPos[0];
+          box.cy = savedPos[1];
           onCollideWall();
         }
         else
@@ -281,7 +303,7 @@ class PacmanAgent extends Agent
       frightenTime -= delta;
       if (frightenTime <= 0)
       {
-        env().requestFrightenTimeEnd();
+        env.requestFrightenTimeEnd();
       }
     }
   }

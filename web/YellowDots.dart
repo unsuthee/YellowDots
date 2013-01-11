@@ -15,7 +15,6 @@ part 'agents/blinky.dart';
 part 'agents/pinky.dart';
 part 'agents/inky.dart';
 part 'agents/pokey.dart';
-part 'GameObject.dart';
 part 'capsule.dart';
 part 'imageData.dart';
 part 'maze.dart';
@@ -75,7 +74,6 @@ class PacmanGame
     
     layout = new Layout();
     env = new Environment(this, layout);
-    env.restartGame();
     
     maze = new Maze();
     maze.initWallData(layout.currentLayout());

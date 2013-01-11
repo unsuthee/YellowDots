@@ -65,8 +65,8 @@ class Blinky extends Agent
   List computeTargetPos()
   {
     // get Pacman position
-    int tx = env().pacman.tilex;
-    int ty = env().pacman.tiley;
+    int tx = env.pacman.tilex;
+    int ty = env.pacman.tiley;
    
     switch (_state)
     {

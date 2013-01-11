@@ -26,6 +26,11 @@ class Scoreboard
     _totalScore += score;  
   }
   
+  void incLifeCount(int delta)
+  {
+    _lives += delta;
+  }
+  
   void drawScore()
   {
     query("#score").text = "Score : ${_totalScore}";

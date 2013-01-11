@@ -62,9 +62,9 @@ class Inky extends Agent
   
   List computeTargetPos()
   {
-    int px = env().pacman.tilex;
-    int py = env().pacman.tiley;
-    switch (env().pacman.direction)
+    int px = env.pacman.tilex;
+    int py = env.pacman.tiley;
+    switch (env.pacman.direction)
     {
       case DEF.NORTH:
         py = py - 2;
@@ -80,8 +80,8 @@ class Inky extends Agent
         break;
     }
     // get Blinky's position
-    int bx = env().blinky.tilex;
-    int by = env().blinky.tiley;
+    int bx = env.blinky.tilex;
+    int by = env.blinky.tiley;
     // get a target vector
     int tx = bx + (px - bx) * 2;
     int ty = by + (py - by) * 2;

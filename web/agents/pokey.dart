@@ -63,8 +63,8 @@ class Pokey extends Agent
   List computeTargetPos()
   {
     //get Pacman's position
-    int px = env().pacman.tilex;
-    int py = env().pacman.tiley;
+    int px = env.pacman.tilex;
+    int py = env.pacman.tiley;
     int distance = DEF.Distance(px,py,tilex,tiley);
     // determine the target position
     int tx = (distance >= 64) ? px: scaredTarget[0];

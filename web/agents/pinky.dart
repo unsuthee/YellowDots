@@ -64,9 +64,9 @@ class Pinky extends Agent
   List computeTargetPos()
   {
     // get Pacman position
-    int tx = env().pacman.tilex;
-    int ty = env().pacman.tiley;
-    switch (env().pacman.direction)
+    int tx = env.pacman.tilex;
+    int ty = env.pacman.tiley;
+    switch (env.pacman.direction)
     {
       case DEF.NORTH:
         ty = ty - 4;

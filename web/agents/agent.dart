@@ -1,12 +1,6 @@
 part of YellowDots;
 
-/**
- * TODO: Need to remove Frighten State 
- * 
- * 
- **/
-
-abstract class Agent extends GameObject
+abstract class Agent
 {
   String _name;
   var _animationSet = null;
@@ -21,12 +15,19 @@ abstract class Agent extends GameObject
   int _nextDirection;
   
   bool _visible;
+  Environment _env;
+  Box2D _box;
   
   num trapCounter = 0;
+  
+  int get state => _state;
   
   String get name => _name;
   List get bornTarget;
   num get trapDuration;
+  
+  Box2D get box => _box;
+  Environment get env => _env;
   
   Direction _currDirection = null;
   
@@ -36,8 +37,10 @@ abstract class Agent extends GameObject
           Box2D box, 
           int direction:DEF.NORTH,
           int speed:3 
-        }): super(env,box)
+        })
   {
+    _env = env;
+    _box = box;
     _name = name;
     _currentDirection = direction;
     _currentSpeed = speed;
@@ -217,12 +220,12 @@ abstract class Agent extends GameObject
     bool warp = false;
     if (tilex == 0 && tiley == 15)
     {
-      box().cx = 28 * DEF.SIZE_BLOCK + DEF.SIZE_HALF_BLOCK;
+      box.cx = 28 * DEF.SIZE_BLOCK + DEF.SIZE_HALF_BLOCK;
       warp = true;
     }
     else if (tilex == 29 && tiley == 15)
     {
-      box().cx = 1 * DEF.SIZE_BLOCK + DEF.SIZE_HALF_BLOCK;
+      box.cx = 1 * DEF.SIZE_BLOCK + DEF.SIZE_HALF_BLOCK;
       warp = true;
     }
     return warp;
@@ -311,6 +314,11 @@ abstract class Agent extends GameObject
     return (_substate != SUB_STATE_NORMAL);
   }
   
+  bool isKO()
+  {
+    return (_state == STATE_KO);
+  }
+  
   static const int STATE_IDLE = 1;
   static const int STATE_MOVING = 2;
   static const int STATE_SCATTER = 3;
@@ -389,11 +397,17 @@ abstract class Agent extends GameObject
       }
       Animation anim = new Animation(name:animId,loopBack:loop);
       
+      int duration = 100; //ms
+      if (animation.containsKey("default_duration"))
+      {
+        duration = animation["default_duration"].toInt();
+      }
+      
       assert(animation.containsKey("sprites") == true);
       List sprites = animation["sprites"];
       for (List srcPos in sprites)
       {
-        anim.AddSprite(new Sprite(sx:srcPos[0],sy:srcPos[1]), 100);
+        anim.AddSprite(new Sprite(sx:srcPos[0],sy:srcPos[1]), duration);
       }
       _animationSet[animId] = anim;
     }
@@ -420,11 +434,6 @@ abstract class Agent extends GameObject
     }
   }
   
-  void onCollide(GameObject other)
-  {
-    
-  }
-  
   bool hasCollideToWall()
   {
     Maze maze = new Maze();
@@ -435,8 +444,8 @@ abstract class Agent extends GameObject
   {
   }
   
-  int get tilex => box().cx ~/ DEF.SIZE_BLOCK;
-  int get tiley => box().cy ~/ DEF.SIZE_BLOCK;
+  int get tilex => box.cx ~/ DEF.SIZE_BLOCK;
+  int get tiley => box.cy ~/ DEF.SIZE_BLOCK;
   int get direction => _currentDirection;
       
   int calcTileX()
@@ -444,15 +453,15 @@ abstract class Agent extends GameObject
     switch (direction)
     {
       case DEF.NORTH:
-        return box().cx ~/ DEF.SIZE_BLOCK;
+        return box.cx ~/ DEF.SIZE_BLOCK;
       case DEF.SOUTH:
-        return box().cx ~/ DEF.SIZE_BLOCK;
+        return box.cx ~/ DEF.SIZE_BLOCK;
       case DEF.EAST:
-        return (box().cx - DEF.SIZE_HALF_BLOCK) ~/ DEF.SIZE_BLOCK;
+        return (box.cx - DEF.SIZE_HALF_BLOCK) ~/ DEF.SIZE_BLOCK;
       case DEF.WEST:
-        return (box().cx + DEF.SIZE_HALF_BLOCK) ~/ DEF.SIZE_BLOCK;
+        return (box.cx + DEF.SIZE_HALF_BLOCK) ~/ DEF.SIZE_BLOCK;
       default:
-        return box().cx ~/ DEF.SIZE_BLOCK;
+        return box.cx ~/ DEF.SIZE_BLOCK;
     }
   }
   
@@ -461,15 +470,15 @@ abstract class Agent extends GameObject
     switch (direction)
     {
       case DEF.NORTH:
-        return (box().cy + DEF.SIZE_HALF_BLOCK) ~/ DEF.SIZE_BLOCK;
+        return (box.cy + DEF.SIZE_HALF_BLOCK) ~/ DEF.SIZE_BLOCK;
       case DEF.SOUTH:
-        return (box().cy - DEF.SIZE_HALF_BLOCK) ~/ DEF.SIZE_BLOCK;
+        return (box.cy - DEF.SIZE_HALF_BLOCK) ~/ DEF.SIZE_BLOCK;
       case DEF.EAST:
-        return box().cy ~/ DEF.SIZE_BLOCK;
+        return box.cy ~/ DEF.SIZE_BLOCK;
       case DEF.WEST:
-        return box().cy ~/ DEF.SIZE_BLOCK;
+        return box.cy ~/ DEF.SIZE_BLOCK;
       default:
-        return box().cy ~/ DEF.SIZE_BLOCK;
+        return box.cy ~/ DEF.SIZE_BLOCK;
     }
   }
   
@@ -479,13 +488,13 @@ abstract class Agent extends GameObject
       return;
     
     int centerPos = tilex * DEF.SIZE_BLOCK + DEF.SIZE_HALF_BLOCK;
-    if (box().cx < centerPos)
+    if (box.cx < centerPos)
     {
-      box().cx++;
+      box.cx++;
     }
-    else if (box().cx > centerPos)
+    else if (box.cx > centerPos)
     {
-      box().cx--;
+      box.cx--;
     }
   }
   
@@ -495,13 +504,13 @@ abstract class Agent extends GameObject
       return;
     
     int centerPos = tiley * DEF.SIZE_BLOCK + DEF.SIZE_HALF_BLOCK;
-    if (box().cy < centerPos)
+    if (box.cy < centerPos)
     {
-      box().cy++;
+      box.cy++;
     }
-    else if (box().cy > centerPos)
+    else if (box.cy > centerPos)
     {
-      box().cy--;
+      box.cy--;
     }
   }
   
@@ -521,33 +530,33 @@ abstract class Agent extends GameObject
       {
         handleCollision();
         
-        var savedPos = [box().cx,box().cy];
+        var savedPos = [box.cx,box.cy];
         var savedTile = [tilex,tiley];
         
         switch(_currentDirection)
         {
           case DEF.NORTH:
-            box().cy -= _currentSpeed;
+            box.cy -= _currentSpeed;
             alignToVerticalAxis();
             break;
           case DEF.SOUTH:
-            box().cy += _currentSpeed;
+            box.cy += _currentSpeed;
             alignToVerticalAxis();
             break;
           case DEF.EAST:
-            box().cx += _currentSpeed;
+            box.cx += _currentSpeed;
             alignToHorizontalAxis();
             break;
           case DEF.WEST:
-            box().cx -= _currentSpeed;
+            box.cx -= _currentSpeed;
             alignToHorizontalAxis();
             break;
         }
         
         if (hasCollideToWall())
         {
-          box().cx = savedPos[0];
-          box().cy = savedPos[1];
+          box.cx = savedPos[0];
+          box.cy = savedPos[1];
           onCollideWall();
         }
         else
@@ -587,8 +596,8 @@ abstract class Agent extends GameObject
     {
       ctx.strokeStyle = getThemeColor();
       ctx.beginPath();
-      int bx = box().cx;
-      int by = box().cy;
+      int bx = box.cx;
+      int by = box.cy;
       ctx.moveTo(bx,by);
       int tx = _targetTile[0] * DEF.SIZE_BLOCK + DEF.SIZE_HALF_BLOCK;
       int ty = _targetTile[1] * DEF.SIZE_BLOCK + DEF.SIZE_HALF_BLOCK;

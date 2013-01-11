@@ -60,12 +60,6 @@ class Layout
   static const BLINKY   = 'b';
   static const INKY     = 'i';
   static const POKEY    = 'c';
-  
-  static const TINY_MAZE = const [ "------",
-                                   "-%%%--",
-                                   "-%----",
-                                   "-%----",
-                                   "------"];
    
   // 28 x 33 ( col x row ) = 224 x 264 ( pixels )
   static const MAZE_ORIGINAL = 
