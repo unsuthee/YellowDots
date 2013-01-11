@@ -210,7 +210,6 @@ abstract class Agent extends GameObject
   {
   }
   
-  
   List computeTargetPos();
   
   bool performWarp()
@@ -234,8 +233,6 @@ abstract class Agent extends GameObject
     if (_state == STATE_MOVING)
     {
       _state = STATE_SCATTER;   
-      //int oppositeDir = DEF.OppositeDirection(_currentDirection);
-      //_currentDirection = oppositeDir;
     }
   }
   
@@ -244,8 +241,38 @@ abstract class Agent extends GameObject
     if (_state == STATE_SCATTER)
     {
       _state = STATE_MOVING;   
-      //int oppositeDir = DEF.OppositeDirection(_currentDirection);
-      //_currentDirection = oppositeDir;
+    }
+  }
+  
+  int calcReverseDirection()
+  {
+    int tx = tilex;
+    int ty = tiley;
+    var pos = [[DEF.NORTH,tx,ty-1], [DEF.SOUTH,tx,ty+1],
+               [DEF.EAST,tx+1,ty], [DEF.WEST,tx-1,ty]];
+    
+    Maze maze = new Maze();
+    var newPos = pos.filter((l) => (!maze.hasWall(row:l[2],col:l[1]) && l[0] != _currentDirection));
+    assert(newPos.length > 0);
+    
+    if (newPos.length == 1)
+    {
+      return newPos[0][0];
+    }
+    else
+    {
+      int oppositeDir = DEF.OppositeDirection(_currentDirection);
+      var oppositeDirAction = newPos.filter((l) => l[0] == oppositeDir);
+      if (oppositeDirAction.length == 1) 
+      {
+        return oppositeDirAction[0][0];
+      }
+      else
+      {
+        var rng = new Random();
+        int index = rng.nextInt(newPos.length-1);
+        return newPos[index][0];
+      }
     }
   }
   
@@ -254,7 +281,10 @@ abstract class Agent extends GameObject
     if (_state != STATE_KO)
     {
       _substate = SUB_STATE_FRIGHTEN_1;
-      String animId = getAnimationIdByDirection(direction);
+      // revere direction
+      _currentDirection = calcReverseDirection();
+
+      String animId = getAnimationIdByDirection(_currentDirection);
       assert(animId != null);
       _currAnimation = _animationSet[animId];
     }
