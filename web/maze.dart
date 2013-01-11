@@ -271,9 +271,12 @@ class Maze
     return false;
   }
   
-  void removeDot({int row, int col})
+  void drawBlackDot(CanvasRenderingContext2D ctx, {int row, int col})
   {
-    
+    int px = col * DEF.SIZE_BLOCK;
+    int py = row * DEF.SIZE_BLOCK;
+    ctx.fillStyle = "#000";
+    ctx.fillRect(px, py, DEF.SIZE_BLOCK, DEF.SIZE_BLOCK);
   }
   
   void drawDot(CanvasRenderingContext2D ctx, int size)

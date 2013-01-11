@@ -45,6 +45,7 @@ class PacmanGame
   double fpsAverage;
   
   bool _isBackgroundDirty;
+  var _removedDots;
   
   // Game State
   static const int GAMESTATE_IDLE = 0;
@@ -83,12 +84,18 @@ class PacmanGame
     scoreboard.drawScore();
     scoreboard.drawLevel();
     
+    _removedDots = new List<List<int>>();
     _isBackgroundDirty = false;
   }
   
   void dirtyBackground()
   {
     _isBackgroundDirty = true;
+  }
+  
+  void addRemovedDots({int row, int col})
+  {
+    _removedDots.add([col,row]);
   }
   
   void redrawBackground()
@@ -137,7 +144,15 @@ class PacmanGame
       redrawBackground();
       _isBackgroundDirty = false;
     }
-    
+    else if (_removedDots.length > 0)
+    {
+      maze = new Maze();
+      for (final pos in _removedDots)
+      {
+        maze.drawBlackDot(bgCanvasCtx,col:pos[0],row:pos[1]);
+      }
+      _removedDots.clear();
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     env.update(delta);
     env.draw(ctx);

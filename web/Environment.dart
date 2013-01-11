@@ -225,7 +225,8 @@ class Environment
       Maze maze = new Maze();
       if (maze.removeDotIfExists(row:pacmanPos[1],col:pacmanPos[0]))
       {
-        _game.dirtyBackground();
+        _game.addRemovedDots(row:pacmanPos[1],col:pacmanPos[0]);
+        //_game.dirtyBackground();
         _game.scoreboard.incScore(Scoreboard.DOT_SCORE);
         _game.scoreboard.drawScore();
       }
