@@ -311,7 +311,7 @@ abstract class Agent
   
   bool isEatable()
   {
-    return (_substate != SUB_STATE_NORMAL);
+    return (_state != STATE_KO && _substate != SUB_STATE_NORMAL);
   }
   
   bool isKO()

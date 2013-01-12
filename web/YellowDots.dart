@@ -41,9 +41,11 @@ class PacmanGame
   Maze maze;
   Scoreboard scoreboard;
   
+  // animation frame
   num renderTime;
   double fpsAverage;
   
+  // background canvas
   bool _isBackgroundDirty;
   var _removedDots;
   
@@ -53,7 +55,8 @@ class PacmanGame
   static const int GAMESTATE_PLAYING = 2;
   static const int GAMESTATE_OVER = 3;
   
-  int _currentGameState = GAMESTATE_IDLE;
+  int _currentGameState = GAMESTATE_IDLE;  
+  num _currentPauseDuration = 0;
   
   PacmanGame() 
   {
@@ -96,6 +99,11 @@ class PacmanGame
   void addRemovedDots({int row, int col})
   {
     _removedDots.add([col,row]);
+  }
+  
+  void pauseGame(num duration)
+  {
+    _currentPauseDuration = duration;
   }
   
   void redrawBackground()
@@ -153,6 +161,13 @@ class PacmanGame
       }
       _removedDots.clear();
     }
+    
+    if (_currentPauseDuration > 0)
+    {
+      _currentPauseDuration -= delta;
+      return;
+    }
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     env.update(delta);
     env.draw(ctx);

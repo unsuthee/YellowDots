@@ -7,6 +7,8 @@ class Environment
   Agent         _pacman;
   PacmanGame    _game;
   
+  ////////////////////////////////////////////////////////////////////////////////
+
   Agent get pacman => _pacman;
   Agent get blinky => agents["Blinky"];
   Agent get pinky  => agents["Pinky"];
@@ -19,6 +21,7 @@ class Environment
   num scatterTime;
   static const num chaseTimePeriod = 20000;
   static const num scatterTimePeriod = 7000;
+  static const num PAUSE_AFTER_EATING_DURATION = 500; // ms
 
   ////////////////////////////////////////////////////////////////////////////////
 
@@ -176,6 +179,7 @@ class Environment
        }
     }
     
+    bool hasEatenGhost = false;
     if (colliders.length > 0)
     {
       for(Agent agent in colliders)
@@ -185,6 +189,7 @@ class Environment
           agent.onGhostEaten();
           _game.scoreboard.incScore(Scoreboard.GHOST_SCORE);
           _game.scoreboard.drawScore();
+          hasEatenGhost = true;
         }
         else if (!agent.isKO())
         {
@@ -192,6 +197,11 @@ class Environment
           break;
         }
       }
+    }
+    
+    if (hasEatenGhost)
+    {
+      _game.pauseGame(PAUSE_AFTER_EATING_DURATION);
     }
     
     bool hasCollide = false;
