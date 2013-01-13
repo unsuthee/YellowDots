@@ -110,18 +110,10 @@ class Environment
     _game.scoreboard.incLifeCount(-1);
     if (_game.scoreboard.lives == 0)
     {
-      print("game is over");
+      _game.setGameover();
     }
     setupAgents(_game.layout);
     _game.dirtyBackground();
-    
-    /**
-    for (Agent ghost in agents.values)
-    {
-      ghost.onGameRestart();
-    }
-    pacman.onGameRestart();
-    **/
   }
   
   void notifyPacmanEaten(Agent eater)

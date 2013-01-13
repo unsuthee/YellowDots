@@ -48,10 +48,10 @@ class PacmanGame
   // background canvas
   bool _isBackgroundDirty;
   var _removedDots;
+  bool _requestGameover;
   
   // Game State
   static const int GAMESTATE_IDLE = 0;
-  static const int GAMESTATE_LOADING = 1;
   static const int GAMESTATE_PLAYING = 2;
   static const int GAMESTATE_OVER = 3;
   
@@ -65,30 +65,52 @@ class PacmanGame
     
     bgCanvas = query("#bg_canvas");
     bgCanvasCtx = bgCanvas.context2d;
+    bgCanvasCtx.font = "bold 16px Arial";
     
     window.on.keyDown.add(keyboardDownHandler, false);
     window.on.keyUp.add(keyboardUpHandler, false);
     window.requestAnimationFrame(tick);
     
-    _currentGameState = GAMESTATE_PLAYING;
+    query('#start_btn').on.click.add((e) {
+      startNewGame();
+    });
+    
+    _currentGameState = GAMESTATE_OVER;
 
     imgCache = new ImageCache();
-    
+    layout = new Layout();
+
+    setupData();
+  }
+  
+  void setupData()
+  {
     scoreboard = new Scoreboard();
     
-    layout = new Layout();
     env = new Environment(this, layout);
     
     maze = new Maze();
     maze.initWallData(layout.currentLayout());
     maze.initDotCapsuleData(layout.currentLayout());
-    redrawBackground();
     
     scoreboard.drawScore();
     scoreboard.drawLevel();
     
     _removedDots = new List<List<int>>();
     _isBackgroundDirty = false;
+    _requestGameover = false;
+    
+    redrawBackground();
+  }
+  
+  void startNewGame()
+  {
+    if (_currentGameState == GAMESTATE_OVER)
+    {
+      _currentGameState = GAMESTATE_PLAYING;
+      setupData();
+      window.requestAnimationFrame(tick);
+    }
   }
   
   void dirtyBackground()
@@ -121,6 +143,11 @@ class PacmanGame
       renderLoop(canvasCtx);
       window.requestAnimationFrame(tick);
     }
+  }
+  
+  void setGameover()
+  {
+    _requestGameover = true;
   }
   
   /**
@@ -160,6 +187,15 @@ class PacmanGame
         maze.drawBlackDot(bgCanvasCtx,col:pos[0],row:pos[1]);
       }
       _removedDots.clear();
+    }
+    
+    if (_requestGameover)
+    {
+      _currentGameState = GAMESTATE_OVER;
+      bgCanvasCtx.fillStyle = "#fff";
+      bgCanvasCtx.fillText("Gameover", 200, 300);
+      _requestGameover = false;
+      return;
     }
     
     if (_currentPauseDuration > 0)

@@ -16,6 +16,11 @@ class Scoreboard
   
   Scoreboard()
   {
+    reset();
+  }
+  
+  void reset()
+  {
     _totalScore = 0;
     _lives = 3;
     _currentLevel = 1;
