@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// YellowDots
+// Author: UnSuthee
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 library YellowDots;
 
 import 'dart:html';
@@ -6,7 +11,6 @@ import 'dart:math';
 
 part 'definition.dart';
 part 'box.dart';
-part 'direction.dart';
 part 'layout.dart';
 part 'Environment.dart';
 part 'agents/agent.dart';
@@ -49,6 +53,7 @@ class PacmanGame
   bool _isBackgroundDirty;
   var _removedDots;
   bool _requestGameover;
+  bool _requestCompleteLevel;
   
   // Game State
   static const int GAMESTATE_IDLE = 0;
@@ -81,6 +86,8 @@ class PacmanGame
     layout = new Layout();
 
     setupData();
+    bgCanvasCtx.fillStyle = "#fff";
+    bgCanvasCtx.fillText("Press the start button!", 155, 300);
   }
   
   void setupData()
@@ -99,6 +106,7 @@ class PacmanGame
     _removedDots = new List<List<int>>();
     _isBackgroundDirty = false;
     _requestGameover = false;
+    _requestCompleteLevel = false;
     
     redrawBackground();
   }
@@ -150,6 +158,11 @@ class PacmanGame
     _requestGameover = true;
   }
   
+  void requestCompleteLevel()
+  {
+    _requestCompleteLevel = true;
+  }
+  
   /**
    * Display the animation's FPS in a div.
    */
@@ -198,6 +211,32 @@ class PacmanGame
       return;
     }
     
+    if (_requestCompleteLevel)
+    {
+      bgCanvasCtx.fillStyle = "#fff";
+      bgCanvasCtx.fillText("Level Complete", 180, 300);
+      _requestCompleteLevel = false;
+      
+      int currentLevel = scoreboard.level;
+      int currentScore = scoreboard.score;
+      int currentLives = scoreboard.lives;
+      setupData();
+      scoreboard.score = currentScore + 1;
+      scoreboard.lives = currentLives;
+      scoreboard.level = currentLevel;
+      
+      scoreboard.drawScore();
+      scoreboard.drawLevel();
+      redrawBackground();
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      env.update(delta);
+      env.draw(ctx);
+      
+      pauseGame(3000); // pause game for 3 seconds
+      return;
+    }
+    
     if (_currentPauseDuration > 0)
     {
       _currentPauseDuration -= delta;
@@ -211,24 +250,18 @@ class PacmanGame
   
   void keyboardDownHandler(KeyboardEvent e)
   {
-    //print("CharCode is ${e.charCode}");
-    //print("KeyCode is ${e.keyCode}");
     switch (e.keyCode)
     {
       case 37: // left
-        //env.getGhostByIndex(0).MoveBegin(DEF.WEST);
         env.pacman.MoveBegin(DEF.WEST);
         break;
       case 38: // up
-        //env.getGhostByIndex(0).MoveBegin(DEF.NORTH);
         env.pacman.MoveBegin(DEF.NORTH);
         break;
       case 39: // right
-        //env.getGhostByIndex(0).MoveBegin(DEF.EAST);
         env.pacman.MoveBegin(DEF.EAST);
         break;
       case 40: // down
-        //env.getGhostByIndex(0).MoveBegin(DEF.SOUTH);
         env.pacman.MoveBegin(DEF.SOUTH);
         break;
     }
@@ -239,23 +272,16 @@ class PacmanGame
     switch (e.keyCode)
     {
       case 37: // left
-        //env.getGhostByIndex(0).MoveEnd(DEF.WEST);
         env.pacman.MoveEnd(DEF.WEST);
         break;
       case 38: // up
-        //env.getGhostByIndex(0).MoveEnd(DEF.NORTH);
         env.pacman.MoveEnd(DEF.NORTH);
         break;
       case 39: // right
-        //env.getGhostByIndex(0).MoveEnd(DEF.EAST);
         env.pacman.MoveEnd(DEF.EAST);
         break;
       case 40: // down
-        //env.getGhostByIndex(0).MoveEnd(DEF.SOUTH);
         env.pacman.MoveEnd(DEF.SOUTH);
-        break;
-      case 65:
-        env.requestCapsuleTakenEvent();
         break;
     }
   }

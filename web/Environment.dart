@@ -228,9 +228,15 @@ class Environment
       if (maze.removeDotIfExists(row:pacmanPos[1],col:pacmanPos[0]))
       {
         _game.addRemovedDots(row:pacmanPos[1],col:pacmanPos[0]);
-        //_game.dirtyBackground();
         _game.scoreboard.incScore(Scoreboard.DOT_SCORE);
         _game.scoreboard.drawScore();
+        
+        if (maze.getDotCount() <= 0 && capsules.length <= 0)
+        {
+          _game.scoreboard.incLevel(1);
+          // you have completed the level!
+          _game.requestCompleteLevel();
+        }
       }
     }
     

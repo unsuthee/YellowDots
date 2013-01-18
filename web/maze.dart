@@ -259,6 +259,11 @@ class Maze
     }
   }
   
+  int getDotCount()
+  {
+    return _dots.length;
+  }
+  
   // return true if item exists and is removed from the map
   bool removeDotIfExists({int row, int col})
   {

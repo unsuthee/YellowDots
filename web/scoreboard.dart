@@ -10,6 +10,10 @@ class Scoreboard
   int get lives => _lives;
   int get level => _currentLevel;
   
+  set score(int s) => _totalScore = s;
+  set lives(int l) => _lives = l;
+  set level(int l) => _currentLevel = l;
+  
   static const int DOT_SCORE = 10;
   static const int CAPSULE_SCORE = 100;
   static const int GHOST_SCORE = 200;
@@ -24,6 +28,11 @@ class Scoreboard
     _totalScore = 0;
     _lives = 3;
     _currentLevel = 1;
+  }
+  
+  void incLevel(int lv)
+  {
+    _currentLevel += lv;
   }
   
   void incScore(int score)

@@ -1,6 +1,7 @@
 name:  YellowDots
 description:  A sample application
 
-#dependencies:
+dependencies:
+  browser: any
 #  js: any
 #  unittest: any
