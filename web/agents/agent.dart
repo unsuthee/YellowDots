@@ -28,8 +28,8 @@ abstract class Agent
   
   Box2D get box => _box;
   Environment get env => _env;
-  
-  Direction _currDirection = null;
+   
+  const int FRIGHT_SPEED = 1;
   
   Agent(  name,
         { 
@@ -68,6 +68,8 @@ abstract class Agent
   String getThemeColor();
   
   void onGameRestart();
+  
+  set speed(int s) => _currentSpeed = s;
   
   void onGhostEaten()
   {
@@ -533,22 +535,23 @@ abstract class Agent
         var savedPos = [box.cx,box.cy];
         var savedTile = [tilex,tiley];
         
+        var d = (isEatable())? FRIGHT_SPEED: _currentSpeed;
         switch(_currentDirection)
         {
           case DEF.NORTH:
-            box.cy -= _currentSpeed;
+            box.cy -= d;
             alignToVerticalAxis();
             break;
           case DEF.SOUTH:
-            box.cy += _currentSpeed;
+            box.cy += d;
             alignToVerticalAxis();
             break;
           case DEF.EAST:
-            box.cx += _currentSpeed;
+            box.cx += d;
             alignToHorizontalAxis();
             break;
           case DEF.WEST:
-            box.cx -= _currentSpeed;
+            box.cx -= d;
             alignToHorizontalAxis();
             break;
         }

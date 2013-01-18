@@ -225,6 +225,14 @@ class PacmanGame
       scoreboard.lives = currentLives;
       scoreboard.level = currentLevel;
       
+      if (currentLevel > 2)
+      {
+        env.blinky.speed = 3;
+        env.pinky.speed = 3;
+        env.inky.speed = 3;
+        env.pokey.speed = 3;
+      }
+      
       scoreboard.drawScore();
       scoreboard.drawLevel();
       redrawBackground();
